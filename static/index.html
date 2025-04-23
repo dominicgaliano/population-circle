@@ -32,6 +32,19 @@
             border-radius: 8px;
             width: 200px;
         }
+
+        #radius {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            padding: 1rem;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            width: 200px;
+        }
+
+        #radius-value {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -40,6 +53,12 @@
     <p>Click on the map to choose a point.</p>
 
     <div id="map"></div>
+
+    <!-- Radius selection -->
+    <div id="radius">
+        <p>Radius: <span id="radius-value">10</span> km</p>
+        <input type="range" id="radius-slider" min="3" max="100" value="10" step="1" />
+    </div>
 
     <!-- Coordinates display -->
     <div id="coordinates">
