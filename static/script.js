@@ -10,7 +10,7 @@ const radius_slider = document.getElementById("radius-slider");
 const radius_display = document.getElementById("radius-value");
 const lat_display = document.getElementById("lat");
 const lng_display = document.getElementById("lng");
-const result_display = document.getElementById("result");
+const result_display = document.getElementById("population-result");
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
@@ -24,20 +24,19 @@ window.onload = function () {
   radius_display.textContent = radius;
 };
 
-function onAreaChange() {
+async function onAreaChange() {
   lat_display.textContent = lat;
   lng_display.textContent = lng;
   radius_display.textContent = radius;
 
   if (!circle_area) {
     circle_area = L.circle([lat, lng], { radius: radius * 1000 }).addTo(map);
-    return;
+  } else {
+    circle_area.setLatLng([lat, lng]);
+    circle_area.setRadius(radius * 1000);
   }
 
-  circle_area.setLatLng([lat, lng]);
-  circle_area.setRadius(radius * 1000);
-
-  getAreaPopulation();
+  await getAreaPopulation();
 }
 
 function onSliderChange(_) {
@@ -48,17 +47,26 @@ function onSliderChange(_) {
   // onAreaChange();
 }
 
-function onMapClick(e) {
+async function onMapClick(e) {
   lat = e.latlng.lat;
   lng = e.latlng.lng;
-  onAreaChange();
+  await onAreaChange();
 }
 
-function getAreaPopulation() {
-  let population_result = Math.floor(Math.random() * 100_000 + 1);
+async function getAreaPopulation() {
+  const request = { lat: lat, lng: lng, radius: radius };
+  const response = await fetch("/population", {
+    method: "POST",
+    body: JSON.stringify(request),
+  });
 
-  population = population_result;
-  result_display.textContent = population_result;
+  if (!response.ok) {
+    // Do something
+    return;
+  }
+
+  let population = (await response.json()).population;
+  result_display.textContent = population;
 }
 
 radius_slider.addEventListener("input", onSliderChange, false);
